@@ -1,0 +1,34 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="IhnqNCSbgcdqk5ZNk6ZD">
+    <mxGraphModel dx="1414" dy="841" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="p489QvlwuAXnlcSnQsWR-1" parent="1" style="swimlane;startSize=20;horizontal=0;html=1;whiteSpace=wrap;" value="Пользователь" vertex="1">
+          <mxGeometry height="280" width="970" x="80" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p489QvlwuAXnlcSnQsWR-4" parent="p489QvlwuAXnlcSnQsWR-1" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task2;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;container=1;expand=0;collapsible=0;taskMarker=manual;" value="Сформировать список товаров для закупки&lt;br&gt;(выбрать или своими словами)" vertex="1">
+          <mxGeometry height="80" width="170" x="40" y="19" as="geometry" />
+        </mxCell>
+        <mxCell id="p489QvlwuAXnlcSnQsWR-5" parent="p489QvlwuAXnlcSnQsWR-1" style="shape=mxgraph.bpmn.data2;labelPosition=center;verticalLabelPosition=bottom;align=center;verticalAlign=top;size=15;html=1;" value="Список&amp;nbsp;&lt;div&gt;закупки&amp;nbsp;&lt;div&gt;пользователя&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="40" x="112" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p489QvlwuAXnlcSnQsWR-6" edge="1" parent="p489QvlwuAXnlcSnQsWR-1" source="p489QvlwuAXnlcSnQsWR-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0;entryDx=12.5;entryDy=0;entryPerimeter=0;" target="p489QvlwuAXnlcSnQsWR-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p489QvlwuAXnlcSnQsWR-7" parent="p489QvlwuAXnlcSnQsWR-1" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task2;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;container=1;expand=0;collapsible=0;taskMarker=send;" value="Отправить список товаров для закупки" vertex="1">
+          <mxGeometry height="80" width="110" x="260" y="19" as="geometry" />
+        </mxCell>
+        <mxCell id="p489QvlwuAXnlcSnQsWR-8" edge="1" parent="p489QvlwuAXnlcSnQsWR-1" source="p489QvlwuAXnlcSnQsWR-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" target="p489QvlwuAXnlcSnQsWR-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p489QvlwuAXnlcSnQsWR-2" parent="1" style="swimlane;startSize=20;horizontal=0;html=1;whiteSpace=wrap;" value="Программа &quot;Лучшие цены&quot;" vertex="1">
+          <mxGeometry height="247" width="970" x="80" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="p489QvlwuAXnlcSnQsWR-3" parent="1" style="swimlane;startSize=20;horizontal=0;html=1;whiteSpace=wrap;" value="Ритейлер" vertex="1">
+          <mxGeometry height="190" width="970" x="80" y="607" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
