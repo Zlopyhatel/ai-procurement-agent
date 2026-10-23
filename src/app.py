@@ -64,19 +64,48 @@ with c_btn2:
 
 st.markdown("---")
 
-# Красная кнопка действия
-start_button = st.button("📌 Найти лучшие цены у продавцов", type="primary")
+# ДВЕ РАЗДЕЛЬНЫЕ КНОПКИ ДЛЯ ПРОЗРАЧНОСТИ ПРОЦЕССА
+col_btn_act1, col_btn_act2 = st.columns(2)
 
-st.markdown("### 📊 Мы нашли лучшие цены у продавцов:")
+with col_btn_act1:
+    save_button = st.button("💾 Сохранить заказ в БД", type="secondary", use_container_width=True)
 
-# Логика нажатия
+with col_btn_act2:
+    start_button = st.button("📌 Найти лучшие цены у продавцов", type="primary", use_container_width=True)
+
+st.markdown("### 📊 Статус обработки и результаты:")
+
+# Формируем Payload, который нужен для обеих кнопок
+output_payload = {
+    "client_id": client_id,
+    "order_date": str(order_date),
+    "items": items_to_parse
+}
+
+# --- ЛОГИКА КНОПКИ 1: СОХРАНЕНИЕ ---
+if save_button:
+    if not items_to_parse:
+        st.warning("⚠️ Не заполнено ни одного наименования товара!")
+    else:
+        st.write("### 📤 Фронтенд сформировал JSON-контракт:")
+        st.json(output_payload)
+
+        from order_service import OrderService
+
+        with st.spinner(" 💾 Бэкенд записывает заказ в базу данных..."):
+            try:
+                service = OrderService()
+                saved_order_id = service.save_frontend_order(output_payload)
+                st.success(f"🎉 Заказ успешно сохранен в БД! Присвоен ID заказа: {saved_order_id}")
+                st.balloons()  # Визуальный триггер успеха для пользователя
+            except Exception as e:
+                st.error(f"❌ Ошибка бэкенда при записи: {e}")
+
+# --- ЛОГИКА КНОПКИ 2: ПОИСК ЦЕН (Будущий ИИ-контур) ---
 if start_button:
     if not items_to_parse:
         st.warning("⚠️ Не заполнено ни одного наименования товара!")
     else:
-        output_payload = {
-            "client_id": client_id,
-            "order_date": str(order_date),
-            "items": items_to_parse
-        }
-        st.json(output_payload)
+        st.info("🤖 Запуск ИИ-агента для сопоставления позиций с каталогами Комус и Атташе...")
+        st.warning("Блок матчинга цен будет подключен на следующем шаге разработки.")
+
