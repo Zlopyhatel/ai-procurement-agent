@@ -1,69 +1,82 @@
 import streamlit as st
-import pandas as pd
-import os
-# Импортируем наш новый коннектор
-from llm_connector import LLMConnector
+import datetime
 
-st.set_page_config(
-    page_title="Smart Procurement Engine",
-    page_icon="🛍️",
-    layout="wide"
-)
+# Инициализация сессионного состояния для динамических строк
+if "input_rows" not in st.session_state:
+    st.session_state.input_rows = 1
 
-st.title("🛍️ Smart Procurement Engine")
-st.subheader("AI-Powered Price Monitor & Sourcing Assistant")
+# === НАСТРОЙКА ИНТЕРФЕЙСА ===
+st.set_page_config(page_title="Procurement Assistant", page_icon="📝", layout="wide")
+
+# Заголовок
+st.markdown("### 🛒 Добавьте товары и укажите требуемое количество")
+
+# Поля метаданных
+col_meta1, col_meta2 = st.columns(2)
+with col_meta1:
+    client_id = st.text_input("Идентификатор клиента (Client ID):", value="CLIENT-777-XYZ")
+with col_meta2:
+    order_date = st.date_input("Дата заказа:", value=datetime.date.today())
+
+st.write("")  # Отступ
+
+# Сбор элементов формы
+items_to_parse = []
+
+for i in range(st.session_state.input_rows):
+    row_id = i + 1
+    # АДАПТИВНАЯ ВЕРСТКА СТРОКИ: Отдаем 85% ширины под текст и 15% под количество
+    c1, c2 = st.columns([0.85, 0.15])
+
+    with c1:
+        good_name = st.text_input(
+            f"Наименование товара {row_id}:",
+            placeholder="Введите тут наименование товара (например: Бумага Svetocopy А4)",
+            key=f"name_{row_id}"
+        )
+    with c2:
+        quantity = st.number_input(
+            "Кол-во:",
+            min_value=1,
+            value=1,
+            step=1,
+            key=f"qty_{row_id}"
+        )
+
+    if good_name.strip():
+        items_to_parse.append({
+            "good_name": good_name.strip(),
+            "quantity": quantity
+        })
+
+# АДАПТИВНАЯ ВЕРСТКА КНОПОК: Выделяем под кнопки очень узкие колонки,
+# а остальную ширину (80%) оставляем пустой справа. Текст больше не сожмется.
+c_btn1, c_btn2, _ = st.columns([0.1, 0.1, 0.8])
+with c_btn1:
+    if st.button("➕ Добавить", use_container_width=True):
+        st.session_state.input_rows += 1
+        st.rerun()
+with c_btn2:
+    if st.button("❌ Удалить", use_container_width=True):
+        if st.session_state.input_rows > 1:
+            st.session_state.input_rows -= 1
+            st.rerun()
+
 st.markdown("---")
 
-col1, col2 = st.columns()
+# Красная кнопка действия
+start_button = st.button("📌 Найти лучшие цены у продавцов", type="primary")
 
-with col1:
-    st.header("📋 Procurement Request")
+st.markdown("### 📊 Мы нашли лучшие цены у продавцов:")
 
-    user_query = st.text_area(
-        label="What do you need to buy? (Enter in plain English):",
-        value="Need to buy 2 packs of SvetoCopy A4 paper and 3 liters of milk. Budget is $15 total.",
-        height=150
-    )
-
-    start_button = st.button("🚀 Find Best Prices", type="primary")
-
-with col2:
-    st.header("📊 Market Offers & Analysis")
-
-    data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
-    tab1, tab2, tab3 = st.tabs(["Market A (Metro)", "Market B (Auchan)", "Market C (Lenta)"])
-
-    try:
-        with tab1:
-            st.dataframe(pd.read_csv(os.path.join(data_dir, "market_a_prices.csv")), use_container_width=True)
-        with tab2:
-            st.dataframe(pd.read_csv(os.path.join(data_dir, "market_b_prices.csv")), use_container_width=True)
-        with tab3:
-            st.dataframe(pd.read_csv(os.path.join(data_dir, "market_c_prices.csv")), use_container_width=True)
-    except FileNotFoundError:
-        st.warning("⚠️ Mock data files not found.")
-
-    st.markdown("---")
-    st.subheader("🤖 AI Sourcing Recommendation")
-
-    if start_button:
-        st.info(f"Processing query: *\"{user_query}\"*")
-
-        # Инициализируем коннектор и запускаем цепочку обработки текста
-        llm = LLMConnector()
-        try:
-            # 1. Валидируем и чистим текст
-            cleaned_text = llm.validate_and_clean_text(user_query)
-
-            # 2. Получаем структурированный список товаров (пока мок)
-            parsed_items = llm.get_mock_ai_parsing(cleaned_text)
-
-            # Отображаем пользователю, как система "увидела" его запрос
-            st.success("Text successfully parsed by UI controller!")
-            st.write("### Extracted Items Schema (JSON):")
-            st.json(parsed_items)
-
-        except ValueError as e:
-            st.error(f"Validation Error: {e}")
+# Логика нажатия
+if start_button:
+    if not items_to_parse:
+        st.warning("⚠️ Не заполнено ни одного наименования товара!")
     else:
-        st.write("Click the button on the left to simulate the procurement matching process.")
+        output_payload = {
+            "client_id": client_id,
+            "order_date": str(order_date),
+            "items": items_to_parse
+        }
+        st.json(output_payload)
