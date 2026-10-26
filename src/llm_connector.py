@@ -1,42 +1,71 @@
+import os
 import json
+import requests
+
+# Находим путь к config.json в корне проекта относительно текущего файла src/llm_connector.py
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "..", "config.json"))
 
 
-class LLMConnector:
-    def __init__(self):
-        # Здесь в будущем мы инициализируем подключение к API (OpenAI / Ollama)
-        pass
+def load_ollama_config():
+    """Загружает настройки Ollama из конфигурационного файла"""
+    try:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            config = json.load(f)
+            return config.get("ollama", {})
+    except Exception as e:
+        print(f"⚠️ Ошибка загрузки config.json для Ollama: {e}")
+        # Безопасный фолбек, если файл не найден
+        return {
+            "url": "http://localhost:11434/api/generate",
+            "model_name": "qwen2.5:7b",
+            "timeout_seconds": 90
+        }
 
-    def validate_and_clean_text(self, raw_text: str) -> str:
-        """
-        Базовый ФЛК (Форматно-логический контроль) текста.
-        Очищает строку от лишних пробелов и проверяет, что запрос не пустой.
-        """
-        if not raw_text or len(raw_text.strip()) < 5:
-            raise ValueError("The request text is too short or empty. Please specify what you want to buy.")
 
-        return raw_text.strip()
+def match_items_with_catalog(incoming_names: list[str], existing_catalog: list[dict]) -> dict[str, int]:
+    if not incoming_names:
+        return {}
+    if not existing_catalog:
+        return {name: None for name in incoming_names}
 
-    def get_mock_ai_parsing(self, cleaned_text: str) -> list:
-        """
-        Временный метод-заглушка (Mock), который имитирует то, что вернет нам ИИ.
-        Показывает, к какой структуре данных (JSON/List) мы стремимся.
-        """
-        print(f"[LLM Connector] Received text for parsing: {cleaned_text}")
+    # Динамически получаем параметры ИИ из конфига
+    ollama_cfg = load_ollama_config()
+    ollama_url = ollama_cfg.get("url")
+    model_name = ollama_cfg.get("model_name")
+    timeout = ollama_cfg.get("timeout_seconds", 90)
 
-        # Симулируем работу ИИ: он распознал в тексте бумагу и молоко
-        mock_parsed_items = [
-            {
-                "good_name": "SvetoCopy A4 paper",
-                "quantity": 2,
-                "required_unit": "pack",
-                "max_price": None  # ИИ не нашел жесткого ограничения по цене на этот товар
-            },
-            {
-                "good_name": "milk 3.2%",
-                "quantity": 3,
-                "required_unit": "liter",
-                "max_price": None
-            }
-        ]
+    prompt = f"""
+    Ты — ИИ-модуль сопоставления товаров (Entity Matching) для Smart Procurement Engine.
+    Твоя задача — определить, есть ли новые товары из прайс-листа в нашем существующем каталоге.
+    Они могут называться немного по-разному (разный порядок слов, сокращения).
 
-        return mock_parsed_items
+    Существующий каталог товаров нашей системы:
+    {json.dumps(existing_catalog, ensure_ascii=False)}
+
+    Новые товары для анализа:
+    {json.dumps(incoming_names, ensure_ascii=False)}
+
+    Верни ответ строго в формате JSON-объекта, где:
+    Ключ — это точное название нового товара из списка для анализа.
+    Значение — целое число (id) найденного товара из существующего каталога. Если совпадений абсолютно точно нет, верни null.
+
+    Не пиши никаких объяснений, преамбул и markdown-разметки. Только чистый JSON.
+    """
+
+    try:
+        response = requests.post(ollama_url, json={
+            "model": model_name,
+            "prompt": prompt,
+            "stream": False,
+            "format": "json"
+        }, timeout=timeout)
+
+        if response.status_code == 200:
+            result_text = response.json().get("response", "{}")
+            return json.loads(result_text)
+        else:
+            return {name: None for name in incoming_names}
+    except Exception as e:
+        print(f"❌ Ошибка подключения к Ollama: {e}")
+        return {name: None for name in incoming_names}

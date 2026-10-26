@@ -1,0 +1,49 @@
+{
+  "database": {
+    "file_name": "procurement_orders.db",
+    "folder_name": "data"
+  },
+  "pricelists": {
+    "folder_name": "pricelists",
+    "configs": {
+      "komus_opt_price_7.xlsx": {
+        "retailer_name": "Комус",
+        "read_all_sheets": false,
+        "skip_sheets": [],
+        "header_row": 4,
+        "mapping": {
+          "sku": "артикул",
+          "name": "Наименование товара",
+          "price": "базовая цена, руб."
+        }
+      },
+      "PRICELIST_ATTACHER.RU.xlsx": {
+        "retailer_name": "Атташе",
+        "read_all_sheets": true,
+        "skip_sheets": ["Каталог"],
+        "header_row": 0,
+        "mapping": {
+          "sku": "Код товара",
+          "name": "Название",
+          "price": "Цена"
+        }
+      },
+      "SBI-Pr-Kanz.xlsx": {
+        "retailer_name": "Сиббланк издат",
+        "read_all_sheets": false,
+        "skip_sheets": [],
+        "header_row": 4,
+        "mapping": {
+          "sku": "Код",
+          "name": "Наименование",
+          "price": "Цена базовая"
+        }
+      }
+    }
+  },
+  "ollama": {
+    "url": "http://localhost:11434/api/generate",
+    "model_name": "qwen2.5:7b",
+    "timeout_seconds": 90
+  }
+}
