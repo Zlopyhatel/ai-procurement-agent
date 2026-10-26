@@ -10,11 +10,11 @@
         "retailer_name": "Комус",
         "read_all_sheets": false,
         "skip_sheets": [],
-        "header_row": 4,
+        "header_row": 3,
         "mapping": {
-          "sku": "артикул",
+          "sku": "Артикул",
           "name": "Наименование товара",
-          "price": "базовая цена, руб."
+          "price": "Базовая цена, руб."
         }
       },
       "PRICELIST_ATTACHER.RU.xlsx": {
